@@ -5,8 +5,11 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var countryApiRouter = require('./routes/api/country');
+var stateApiRouter = require('./routes/api/state');
+
 
 var countryUiRouter = require('./routes/ui/user/countryTemplete');
+var stateUiRouter = require('./routes/ui/user/stateTemplete');
 
 var app = express();
 
@@ -20,8 +23,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/country', countryApiRouter);
+app.use('/api/state', stateApiRouter);
 
-app.use('/country/', countryUiRouter)
+
+app.use('/country/', countryUiRouter);
+app.use('/state/',stateUiRouter);
+
 
 app.use(function (req, res, next) {
     next(createError(404));

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>country</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        .secondary-body {
+            width: 1250px;
+            height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page {
+            background-color: antiquewhite;
+            width: 1000px;
+            height: auto;
+            padding: 50px;
+            border-radius: 20px;
+        }
+
+        .info {
+            margin-bottom: 50px;
+        }
+
+        .add-button {
+            background-color: #ddd;
+            border: none;
+            color: black;
+            padding: 16px 28px;
+            text-align: center;
+            font-size: 12px;
+            transition: 0.3s;
+            font-size: 12px
+        }
+
+        .table {
+            width: 90%;
+            max-width: 100%;
+            margin-bottom: 20px;
+            margin-left: 42px;
+        }
+
+        .add-button:hover {
+            background-color: skyblue;
+            color: black;
+            border-radius: 10px;
+        }
+
+        .action {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+            margin-right: 22px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-around;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="secondary-body">
+        <div class="page">
+            <div class="info">
+                <h1>State List</h1>
+                <p>The state is a form of human association distinguished from other social groups
+                    by its purpose, the establishment of order and security; its methods, the laws
+                    and their enforcement; its territory, the area of jurisdiction or geographic
+                    boundaries; and finally by its sovereignty.
+                </p>
+            </div>
+            <div class="action">
+                <a type="button" class="add-button" href="state/addState">add State</a>
+            </div>
+            <div class="table">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>State Id</th>
+                            <th>Country Id</th>
+                            <th>State Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(var i=0;i< data.length;i++){ %>
+                            <tr>
+                                <td scope="row">
+                                    <%=data[i].id %>
+                                </td>
+                                <td>
+                                    <%=data[i].countryId %>
+                                </td>
+                                <td>
+                                    <%=data[i].stateName %>
+                                </td>
+                                <td>
+                                    <div class="actions">
+                                        <a class="btn btn-primary" href="state/edit/<%=data[i].id%>">Edit</a>
+                                        <button class="btn btn-danger" onclick="deleteWork('<%=data[i].id %>')">Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script>
+        function deleteWork(id) {
+            if (confirm('Are sure do you want to delete ?')) {
+            const requestOptions = {
+                method: "DELETE",
+                redirect: "follow"
+            };
+
+            fetch("http://localhost:3000/api/state/"+id, requestOptions)
+                .then((response) => response.text())
+                .then(location.reload())
+                .catch((error) => console.error(error));
+        }
+    }
+    </script>
+</body>
+
+</html>
