@@ -18,7 +18,7 @@
         .page {
             background-color: antiquewhite;
             width: 1000px;
-            height: auto;
+            height: 670px;
             padding: 50px;
             border-radius: 20px;
         }
@@ -53,16 +53,29 @@
 
         .action {
             display: flex;
-            justify-content: flex-end;
-            margin-bottom: 10px;
-            margin-right: 22px;
+            justify-content: space-around;
+            margin: 10px;
         }
 
         .actions {
             display: flex;
             justify-content: space-around;
-
         }
+
+        body {
+            background-color: #f99f23;
+        }
+
+        .filter {
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+        }
+        .margin-right {
+            margin-right: 26px;
+        }
+
+        
     </style>
 </head>
 
@@ -78,14 +91,40 @@
                 </p>
             </div>
             <div class="action">
-                <a type="button" class="add-button" href="state/addState">add State</a>
+                <div class="filter">
+                    <div>
+                        <label for="countryName">Filter :</label>
+                        <select name="countryName" id="countryName">
+                            <option></option>
+                            <% for(var i=0;i< data2.length;i++){ %>
+                                <option value="<%=data2[i].id %>">
+                                    <%=data2[i].name %>
+                                </option>
+                                <% } %>
+                        </select>
+                    </div>
+                    <button type="button" onclick="filter()">Submit</button>
+                </div>
+                <div class="search">
+                    <form>
+                        <div class="searchBar">
+                            <input type="text" placeholder=" Search " name="search" id="search"
+                                value="<%= searchValue %>">
+
+                            <button onclick="search()">Search</button>
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <a type="button" class="add-button margin-right" href="state/addState">add State</a>
+                </div>
             </div>
             <div class="table">
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>State Id</th>
-                            <th>Country Id</th>
+                            <th>Serial No</th>
+                            <th>Country Name</th>
                             <th>State Name</th>
                             <th>Actions</th>
                         </tr>
@@ -97,7 +136,7 @@
                                     <%=data[i].id %>
                                 </td>
                                 <td>
-                                    <%=data[i].countryId %>
+                                    <%=data[i].name %>
                                 </td>
                                 <td>
                                     <%=data[i].stateName %>
@@ -113,23 +152,60 @@
                             <% } %>
                     </tbody>
                 </table>
+                <center>
+                    <nav aria-label="...">
+                        <ul class="pagination">
+                            <li class="page-item <% if(page ==1) { %>disabled<% } %>">
+                                <a class="page-link"
+                                    href="?page=<%=page - 1 %>&<%=Pagination %>">Previous</a>
+                            </li>
+                            <% for(var i=1;i<=pageTotal;i++) { %>
+                                <li class="page-item <% if(page == i) { %>disabled<% } %>">
+                                    <a class="page-link" href="?page=<%=i %>&<%=Pagination %>">
+                                        <%=i %>
+                                    </a>
+                                </li>
+                                <%} %>
+                                    <li class="page-item <% if(pageTotal == page) { %>disabled<% } %>">
+                                        <a class="page-link"
+                                            href="?page=<%=page + 1 %>&<%=Pagination %>">Next</a>
+                                    </li>
+                        </ul>
+                    </nav>
+
+                </center>
             </div>
         </div>
     </div>
+
     <script>
         function deleteWork(id) {
             if (confirm('Are sure do you want to delete ?')) {
-            const requestOptions = {
-                method: "DELETE",
-                redirect: "follow"
-            };
+                const requestOptions = {
+                    method: "DELETE",
+                    redirect: "follow"
+                };
 
-            fetch("http://localhost:3000/api/state/"+id, requestOptions)
-                .then((response) => response.text())
-                .then(location.reload())
-                .catch((error) => console.error(error));
+                fetch("http://localhost:3000/api/state/" + id, requestOptions)
+                    .then((response) => response.text())
+                    .then(location.reload())
+                    .catch((error) => console.error(error));
+            }
         }
-    }
+
+        function filter() {
+            var id = document.querySelector('#countryName').value;
+            window.location.replace("http://localhost:3000/state?countryId=" + id);
+        }
+        // var id = document.querySelector('#countryName').value;
+        // document.getElementById('')
+
+        function search() {
+            var search = document.getElementById('search').value;
+            window.location.replace("http://localhost:3000/state?search=" + search);
+        }
+
+
     </script>
 </body>
 

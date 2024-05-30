@@ -13,6 +13,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-evenly;
+            background-color: orange;
         }
 
         .page {
@@ -40,6 +41,7 @@
             box-shadow: 50px;
             box-shadow: 10px 10px 5px rgb(159, 158, 158);
             transition: 0.5s;
+            background-color: oldlace
 
         }
 
@@ -88,13 +90,20 @@
 
 <body class="body">
     <div class="font">
-        <h1>Add country</h1>
+        <h1><%=pageName %> State</h1>
     </div>
     <div class="page">
         <div class="inputBox ">
             <div class="input1">
-                <label for="countryId" class="label-name">Country Id : </label>
-                <input type="number" id="countryId" name="countryId" class="input" value="<%=data.countryId %>">
+                <div class="drop-down">
+                    <label for="country">  country :</label>
+                    <select name="country" id="country" value="<%=data.name %>">
+                        <option>Select Country</option>
+                        <% for(var i=0;i< result.length;i++){ %>
+                        <option value="<%=result[i].id %>"><%=result[i].name %></option>
+                        <% } %>
+                    </select>
+                </div>
             </div>
             <div class="input1">
                 <label for="name" class="label-name">State Name : </label>
@@ -102,8 +111,8 @@
                 <input type="hidden" id="stateId" name="stateId" class="input" value="<%=data.id %>">
             </div>
             <div class="buttons">
-                <button type="button" class="submit-button" onclick="addState()">submit</button>
                 <button type="button" class="cancel-button" onclick="cancel()">cancel</button>
+                <button type="button" class="submit-button" onclick="addState()">submit</button>
             </div>
         </div>
     </div>
@@ -111,8 +120,8 @@
         function addState() {
             const myHeaders = new Headers();
             myHeaders.append("Content-Type", "application/json");
-
-            var id = document.getElementById('countryId').value;
+            
+            var id = document.querySelector('#country').value;
             var name = document.getElementById('name').value;
             var stateId = document.getElementById('stateId').value;
             const raw = JSON.stringify({

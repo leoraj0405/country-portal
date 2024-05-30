@@ -9,14 +9,53 @@ var con = mysql.createConnection({
     database: 'mydb'
 })
 
+
 router.get('/', function (req, res) {
+    const {
+        page = 1,
+        limit = 5,
+        search = '',
+        countryId = '',
+    } = req.query;
+    
+    const pageNo = isNaN(Number(page)) ? 1 : Number(page)
+    const limitNo = isNaN(Number(limit)) ? 5 : Number(limit)
+    //console.log(pageNo,limitNo)
+    const responseData = {
+        data: [],
+        total: '',
+        page : pageNo,
+        limit :limitNo,
+        searchValue : '',
+        countryId : '',
+    }
     try {
-        con.query('select * from state', function (error, stateRes) {
-            if (error) {
-                res.status(409).send("Table not exist")
-            } else {
-                res.status(200).send(stateRes)
-            }
+       let sqlQuery1 = `select count(id) as total from state`
+       const condition = []
+
+       if (search){
+        condition.push(` stateName LIKE '%${search}%'`)
+       } 
+       if(countryId) {
+        condition.push(`countryId = ${countryId}`)
+       }
+       condtionStr = condition.length ? ` WHERE ${condition.join(' AND ')}` : ''
+       sqlQuery1 += condtionStr
+
+        con.query(sqlQuery1, function (error, resultCount) {
+            responseData.total = resultCount[0].total;
+
+            let sqlQuery2 = `select s.*,c.name from state s join country as c ON c.id = s.countryId ${condtionStr} limit ?  offset ?`
+            con.query(sqlQuery2,[limitNo,(pageNo - 1)*limitNo], function (err, result) {
+                if (err){
+                    console.log(err)
+                }
+                responseData.data = result;
+                responseData.searchValue = search;
+                responseData.countryId = countryId;
+                res.send(responseData)
+            })
+            
         })
     } catch (error) {
         console.error(error)
@@ -24,35 +63,21 @@ router.get('/', function (req, res) {
 })
 
 router.get('/:stateId', function (req, res) {
-    console.log('state')
     const id = req.params.stateId;
     try {
-        con.query('select * from state where id = ?', [id], function (error, result) {
+        con.query(`select s.*,c.name from state s join country as c ON c.id = s.countryId where s.id = ${id}`, function (error, result) {
             if (error) {
                 res.send(error)
+            }else{
+                res.status(200).send(result[0])
             }
-            res.status(200).send(result[0])
 
         })
     } catch (error) {
         console.error(error)
     }
 })
-router.get('/country/:id', function (req, res) {
-    console.log('country')
-    const id = req.params.id;
-    try {
-        con.query('select * from state where countryId = ?', [id], function (error, result) {
-            if (error) {
-                res.send(error)
-            }
-            res.status(200).send(result)
 
-        })
-    } catch (error) {
-        console.error(error)
-    }
-})
 router.post('/', (req, res) => {
     const {
         countryId,
@@ -80,8 +105,9 @@ router.put('/:stateId', (req, res) => {
             countryId,
             stateName,
         } = req.body;
-        con.query('UPDATE state SET countryId = ?, stateName = ? WHERE id = ? ', [countryId,stateName,id], (err, result) => {
-            con.query('select *  from state where id = ?', [id], (err2, resultData) => {
+        con.query('UPDATE state SET countryId = ?, stateName = ? WHERE id = ? ', [countryId, stateName, id], (err, result) => {
+            con.query('select s.*,c.name from state s join country as c ON c.id = s.countryId where id = ?', [id], (err2, resultData) => {
+                console.log(resultData)
                 if (err) {
                     res.status(409).send(err)
                 } else {
@@ -94,32 +120,32 @@ router.put('/:stateId', (req, res) => {
     }
 })
 
-router.delete('/countryDel/:countryid', (req, res) => {
-    const id = req.params.countryid;
-    try {
-        con.query('DELETE FROM state WHERE countryId = ?', [id], (err, result) => {
-            if(result.affectedRows === 0) {
-                res.send("Invalid State Id ")
-            }
-            else{
-                res.status(200).send('Row Deleted')
-            }  
-        })
-    } catch (error) {
-        console.error(error)
-    }
-})
+// router.delete('/countryDel/:countryid', (req, res) => {
+//     const id = req.params.countryid;
+//     try {
+//         con.query('DELETE FROM state WHERE countryId = ?', [id], (err, result) => {
+//             if (result.affectedRows === 0) {
+//                 res.send("Invalid State Id ")
+//             }
+//             else {
+//                 res.status(200).send('Row Deleted')
+//             }
+//         })
+//     } catch (error) {
+//         console.error(error)
+//     }
+// })
 
 router.delete('/:id', (req, res) => {
     const id = req.params.id;
     try {
         con.query('DELETE FROM state WHERE id = ?', [id], (err, result) => {
-            if(result.affectedRows === 0) {
+            if (result.affectedRows === 0) {
                 res.send("Invalid State Id ")
             }
-            else{
+            else {
                 res.status(200).send('Row Deleted')
-            }  
+            }
         })
     } catch (error) {
         console.error(error)
